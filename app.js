@@ -17,23 +17,26 @@ GAME RULES:
 //var x = document.querySelector('#score-0').textContent;
 //console.log(x);
 
-var scores, roundScore, activePlayer;
+var scores, roundScore, activePlayer, gamePlaying; // variable set in global scope allows access for all functions
 
-scores = [0,0];
-roundScore = 0;
-activePlayer = 0;
+init ();
+
+//scores = [0,0];  made this into 'init' function above after repeating code to initialize start
+//roundScore = 0;
+//activePlayer = 0;
 
 // querySelector to select elements in DOM (class and id)
-document.querySelector('.dice').style.display = 'none'; //style = method, display = propery, 'none' = value for display: Sets start of game with no dice image displayed.
+//document.querySelector('.dice').style.display = 'none'; //style = method, display = propery, 'none' = value for display: Sets start of game with no dice image displayed.
 
 // getElementById is another way to select id's from DOM
-document.getElementById('score-0').textContent = '0';
-document.getElementById('score-1').textContent = '0';
-document.getElementById('current-0').textContent = '0';
-document.getElementById('current-1').textContent = '0';
+//document.getElementById('score-0').textContent = '0';
+//document.getElementById('score-1').textContent = '0';
+//document.getElementById('current-0').textContent = '0';
+//document.getElementById('current-1').textContent = '0';
 
 document.querySelector('.btn-roll').addEventListener('click', function() {  //anonymous or "nameless" function only works where deployed. not reusable 
-    // 1. Random number
+    if(gamePlaying) {   // State variable used to define state so when game over functions stop
+        // 1. Random number
     var dice = Math.floor(Math.random() * 6) + 1;
 
     // 2. Display the result
@@ -50,11 +53,13 @@ document.querySelector('.btn-roll').addEventListener('click', function() {  //an
     } else {
         //next player
         nextPlayer();  
-    }
+        }
+    }   
 });
 
 document.querySelector('.btn-hold').addEventListener('click', function() {
-    // add current score to global score
+    if (gamePlaying) { // State variable used to define state so when game over functions stop
+        // add current score to global score
     scores[activePlayer] += roundScore;
 
     // Update the UI
@@ -66,12 +71,12 @@ document.querySelector('.btn-hold').addEventListener('click', function() {
         document.querySelector('.dice').style.display = 'none';
         document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner'); //best practice to use js to change css classes than change the actuall css whenever possible
         document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active');
+        gamePlaying = false; // State variable used to define state so when game over functions stop
     } else {
-        nextPlayer;
+        //Next player
+        nextPlayer();
+        }
     }
-
-    //Next player
-    nextPlayer();
 });
 
 
@@ -87,4 +92,29 @@ function nextPlayer() {  //made this function to condense repeat code
     document.querySelector('.player-1-panel').classList.toggle('active'); 
     
     document.querySelector('.dice').style.display = 'none'; // removes image of dice after roll of 1   
+}
+
+document.querySelector('.btn-new').addEventListener('click', init);
+
+function init() {
+    scores = [0,0];
+    roundScore = 0;
+    activePlayer = 0;
+    gamePlaying = true; // State variable used to define state so when game over functions stop, this sets it back to true
+
+    document.querySelector('.dice').style.display = 'none'; //style = method, display = propery, 'none' = value for display: Sets start of game with no dice image displayed.
+
+    // getElementById is another way to select id's from DOM
+    document.getElementById('score-0').textContent = '0';
+    document.getElementById('score-1').textContent = '0';
+    document.getElementById('current-0').textContent = '0';
+    document.getElementById('current-1').textContent = '0';  
+    document.getElementById('name-0').textContent = 'Player 1'; 
+    document.getElementById('name-1').textContent = 'Player 2'; 
+    document.querySelector('.player-0-panel').classList.remove('winner');
+    document.querySelector('.player-1-panel').classList.remove('winner');
+    document.querySelector('.player-0-panel').classList.remove('active');// need to remove both as we wont know who won and do not want to double up classes
+    document.querySelector('.player-1-panel').classList.remove('active');
+    
+    document.querySelector('.player-0-panel').classList.add('active'); // adding active class back to player 0 for start. 
 }
